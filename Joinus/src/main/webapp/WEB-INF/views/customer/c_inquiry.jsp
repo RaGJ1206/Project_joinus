@@ -54,7 +54,7 @@
         <div>
             <span><h1 style="font-weight: 900; letter-spacing:-1px; display: block; margin-top: -20px">문의 내역</h1></span>
         </div>
-        <br>
+        <hr>
         <c:forEach items="${inqulist}" var="list" varStatus="loop">
             <div class="inquiryItem">
                 <div class="inquiryInfo" style="height: 35px; display: block; margin-top: 6px">
@@ -63,13 +63,13 @@
                             ${loop.index + 1}
                     </span>
                     </div>
-                    <div class="divtag" style="width: 100px; text-align: center;">
+                    <div class="divtag" style="width: 230px; text-align: center;">
                         <a href="board/read?pno=${list.pno}" class="p_name">${list.p_name}</a>
                     </div>
-                    <div class="divtag" style="width: 35px;">
+                    <div class="divtag" style="width: 100px;">
                         <span class="u_name">${list.u_name}</span>
                     </div>
-                    <div class="divtag" style="width: 600px;">
+                    <div class="divtag" style="width: 400px;">
                         <span class="i_title">${list.i_title}</span>
                     </div>
                     <div class="divtag" style="width: 100px;">
@@ -82,7 +82,7 @@
 
         <c:if test="${empty inqulist}">
             <br>
-            <div class="noReviews" style="text-align: center; margin-left: 110px; height: 200px">작성한 문의글이 없습니다.</div>
+            <div class="noReviews" style="text-align: center; margin-left: 70px; height: 200px">작성한 문의글이 없습니다.</div>
         </c:if>
     </div>
 

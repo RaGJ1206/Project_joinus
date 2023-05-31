@@ -223,7 +223,6 @@
         color:#333;
         letter-spacing:-1px;
     }
-
 </style>
 <body class="sub_page about_page">
 <img src="../../../resources/images/banner.png" style="margin-left: 367px; width: 1170px; height: 400px">
@@ -231,7 +230,7 @@
 <br>
 <section>
     <div class="outter">
-        <h1 class="hit">히트상품</h1>
+        <div class="hit"><span style="color: #ff731b;">히트</span>상품</div>
         <hr>
         <div class="board">
             <div class="board-body">
@@ -267,45 +266,67 @@
         </div>
     </div>
 </section>
-<%-- 현재 로그인된 사용자 주소 --%>
-<%--<p>${customerloginUser.u_addrcode}</p>--%>
+<%--&lt;%&ndash; 현재 로그인된 사용자 주소 &ndash;%&gt;--%>
+<%--<p>${customerloginUser.u_addrStreet}</p>--%>
+<%--${customerloginUser.u_addrStreet.substring(0, 6)}--%>
+<%--<p>${businessUser.b_addrStreet}</p>--%>
+<%--${businessUser.b_addrStreet.substring(0, 6)}--%>
 <section>
     <div class="outter" style="flex-grow: 1;">
         <hr>
-        <h1 class="hit1">내 주변 가게</h1>
+        <div class="hit1">내 <span style="color: #ff731b;">주변</span> 가게</div>
         <!-- 옵션선택 끝 -->
         <div class="board1">
             <div class="board-body1">
-                <c:set var="hasNearbyProducts" value="false" />
                 <ul>
-                    <c:forEach var="store" items="${storeVOList}" varStatus="status">
-                        <c:choose>
-                            <c:when test="${customerloginUser.u_addrcode == store.s_addrCode}">
-                                <c:set var="hasNearbyProducts" value="true" />
-                                <c:forEach var="product" items="${productList}" varStatus="productStatus">
-                                    <c:if test="${store.sno == product.sno}">
+                    <c:choose>
+                        <c:when test="${empty customerloginUser && empty businessUser}">
+                            <div style="height: 521px; width: 850px;">
+                                <img src="../../../resources/images/store.png" style="margin-left: 290px; width: 240px; height: 250px; margin-top: 50px">
+                                <span style="margin-left: -170px; letter-spacing: -1px">로그인 해주세요</span>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <c:set var="noMatchingProducts" value="true" />
+                            <c:forEach var="product" items="${productList}" varStatus="productStatus">
+                                <c:forEach var="store" items="${storeVOList}" varStatus="storeStatus">
+                                    <c:if test="${!empty customerloginUser && product.sno == store.sno && store.s_addrStreet.indexOf(customerloginUser.u_addrStreet.substring(0, 6)) != -1}">
                                         <li>
                                             <div class="post-thumbnail1">
                                                 <img src="/display?fileName=${thumbnailList[productStatus.index].uploadPath}/${thumbnailList[productStatus.index].uuid}_${thumbnailList[productStatus.index].fileName}" alt="게시물 썸네일">
                                             </div>
                                             <div class="post-content1">
-                                                <a href='/board/read?pno=${product.pno}'>${product.p_inst}</a>
+                                                <a href='/board/read?pno=${product.pno}'>${product.p_name}</a>
                                             </div>
                                         </li>
+                                        <c:set var="noMatchingProducts" value="false" />
+                                    </c:if>
+                                    <c:if test="${!empty businessUser && product.sno == store.sno && store.s_addrStreet.indexOf(businessUser.b_addrStreet.substring(0, 6)) != -1}">
+                                        <li>
+                                            <div class="post-thumbnail1">
+                                                <img src="/display?fileName=${thumbnailList[productStatus.index].uploadPath}/${thumbnailList[productStatus.index].uuid}_${thumbnailList[productStatus.index].fileName}" alt="게시물 썸네일">
+                                            </div>
+                                            <div class="post-content1">
+                                                <a href='/board/read?pno=${product.pno}'>${product.p_name}</a>
+                                            </div>
+                                        </li>
+                                        <c:set var="noMatchingProducts" value="false" />
                                     </c:if>
                                 </c:forEach>
-                            </c:when>
-                        </c:choose>
-                    </c:forEach>
-                    <c:if test="${not hasNearbyProducts}">
-                        <div style="height: 350px;">
-                            <h5>근처에 등록된 상품이 없습니다.</h5>
-                        </div>
-                    </c:if>
+                            </c:forEach>
+                            <c:if test="${noMatchingProducts}">
+                                <div style="height: 521px; width: 850px;">
+                                    <img src="../../../resources/images/store.png" style="margin-left: 290px; width: 240px; height: 250px; margin-top: 50px">
+                                    <span style="margin-left: -220px; letter-spacing: -1px">근처에 등록된 상품이 없습니다.</span>
+                                </div>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
                 </ul>
             </div>
         </div>
-        <aside style="position: absolute; top: 965px; right: 360px;">
+
+        <aside style="position: absolute; top: 975px; right: 360px;">
             <div style="flex-shrink: 0; width: 300px;">
                 <h1 class="hit">Let's Join Us!</h1>
                 <input type="hidden" id="id" value="${customerloginUser.u_name}">
@@ -317,6 +338,7 @@
                     <input type="button" id="exit" class="exit" value="나가기" />
                 </div>
             </div>
+            <img src="../../../resources/images/friends.png" style="max-width: 280px; margin-top: 28px">
         </aside>
     </div>
 </section>
@@ -340,82 +362,76 @@
 </script>
 <!-- 생략된 코드 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
-    // ##### 입장~~~!!
-    let websocket;
-    connect();
-    function connect(){
-        console.log("통신");
-// 		websocket = new WebSocket("ws://본인 아이 피주소/www/chat-ws");
-        websocket = new WebSocket("ws://localhost:8080/chat-ws");
-        //웹 소켓에 이벤트가 발생했을 때 호출될 함수 등록
-        websocket.onopen = onOpen;
-        websocket.onmessage = onMessage;
-    }
-
-    // ##### 연결 되었습니다!
-    function onOpen() {
-        if (${customerloginUser == null} && ${businessUser == null}) {
-            websocket.send("<div style='color: #7c7c7c; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: center'>로그인 후 이용해주세요.</div>");
-            document.getElementById("message").disabled = true;
-            document.getElementById("send").disabled = true;
-            document.getElementById("exit").disabled = true;
-        }else if(${businessUser != null} && ${customerloginUser == null}){
-            websocket.send("<div style='color: #7c7c7c; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: center;'>사업자는 채팅이 불가능합니다.</div>");
-            document.getElementById("message").disabled = true;
-            document.getElementById("send").disabled = true;
-            document.getElementById("exit").disabled = true;
-        } else {
-            id = document.getElementById("id").value;
-            websocket.send("<div style='color: black; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: center;'>" + id + "님이 입장하셨습니다.</div>");
-        }
-    }
-
-    // ##### 메세지 보내기 버튼 클릭!
-    document.getElementById("send").addEventListener("click", function() {
-        send();
-    });
-
-    function send(){
-        if (websocket.readyState === WebSocket.OPEN) {
-            id = document.getElementById("id").value;
-            msg = document.getElementById("message").value;
-            websocket.send(id + ":" + msg);
-            document.getElementById("message").value = "";
-        }
-    }
-
-    function onMessage(evt){
-        data = evt.data;
-        chatarea = document.getElementById("chatarea");
-
-        // 내가 입력한 메시지인지 확인
-        if (data.startsWith(id + ":")) {
-            chatarea.innerHTML += "<div class='message-box'>" + data + "</div>";
-        } else {
-            chatarea.innerHTML += "<div class='message-box other'>" + data + "</div>";
+    $(document).ready(function (){
+        let websocket;
+        connect();
+        function connect(){
+            websocket = new WebSocket("ws://localhost:8080/chat-ws");
+            websocket.onopen = onOpen;
+            websocket.onmessage = onMessage;
         }
 
-        // 스크롤을 맨 아래로 이동
-        chatarea.scrollTop = chatarea.scrollHeight;
-        // data= evt.data;
-        // chatarea = document.getElementById("chatarea");
-        // chatarea.innerHTML = chatarea.innerHTML + "<br/>" + data
-    }
 
-    // ##### 연결을 해제합니다!
-    document.getElementById("exit").addEventListener("click", function() {
-        disconnect();
-    });
 
-    function disconnect(){
-        id = document.getElementById("id").value;
-        websocket.send("<div class='message-box1'>" + id + "님이 퇴장하셨습니다.</div>");
-        document.getElementById("message").disabled = true;
-        document.getElementById("send").disabled = true;
-        document.getElementById("exit").disabled = true;
+        function onOpen() {
+            if (${customerloginUser == null && businessUser == null}) {
+                websocket.send("<div style='color: #7c7c7c; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: center'>로그인 후 이용해주세요.</div>");
+                $("#message").attr('disabled','true');
+                $("#send").attr('disabled','true');
+                $("#exit").attr('disabled','true');
+                // $("#send").disab
+            }else if(${businessUser != null && customerloginUser == null}){
+                websocket.send("<div style='color: #7c7c7c; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: center;'>사업자는 채팅이 불가능합니다.</div>");
+                $("#message").attr('disabled','true');
+                $("#send").attr('disabled','true');
+                $("#exit").attr('disabled','true');
+            } else {
+                id = $("#id").val();
+                websocket.send("<div style='color: black; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: center;'>" + id + "님이 입장하셨습니다.</div>");
+            }
+        }
 
-        //websocket.close();
-    }
+
+        $("#send").click(function (){
+            send();
+        })
+        function send(){
+            if (websocket.readyState === WebSocket.OPEN) {
+                id = $("#id").val();
+                msg = $("#message").val();
+                websocket.send(id + ":" + msg);
+                $("#message").val("");
+            }
+        }
+
+
+
+        function onMessage(evt) {
+            var data = evt.data;
+            var chatarea = $('#chatarea');
+            if (data.startsWith(id + ":")) {
+                chatarea.append("<div class='message-box'>" + data + "</div>");
+            } else {
+                chatarea.append("<div class='message-box other'>" + data + "</div>");
+            }
+            chatarea.scrollTop(chatarea.prop('scrollHeight'));
+        }
+
+        // ##### 연결을 해제합니다!
+        $("#exit").click(function (){
+            disconnect();
+        })
+        function disconnect(){
+            id = $("#id").val();
+            websocket.send("<div class='message-box1'>" + id + "님이 퇴장하셨습니다.</div>");
+            $("#message").attr('disabled','true');
+            $("#send").attr('disabled','true');
+            $("#exit").attr('disabled','true');
+        }
+    })
+
+
 </script>
 </html>

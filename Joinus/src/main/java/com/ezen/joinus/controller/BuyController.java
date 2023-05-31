@@ -1,3 +1,5 @@
+
+
 package com.ezen.joinus.controller;
 
 import com.ezen.joinus.service.*;
@@ -71,7 +73,6 @@ public class BuyController {
         }
 
         CustomerUserVO customerUserVO = customerService.getCustomerById(id);
-        System.out.println("사용자 정보:"+customerUserVO);
         // 사용자 정보가 없는 경우
         if (customerUserVO == null) {
             return ResponseEntity.badRequest().body("사용자만 이용 가능합니다.");
@@ -215,3 +216,8 @@ public class BuyController {
         return "/board/cartbuy";
     }
 }
+
+
+
+
+

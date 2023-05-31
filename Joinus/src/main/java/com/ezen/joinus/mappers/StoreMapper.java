@@ -9,10 +9,14 @@ import java.util.Map;
 
 @Mapper
 public interface StoreMapper {
+    List<RevenueVO> getRevenueList(int sno);
+
     public void insertStore(StoreVO vo);
     public int s_nameCheck(String s_name);
     public int getMaxSno();
     List<StoreVO> getAllStore();
+
+
     StoreVO getStoreBno(Integer bno);
     StoreVO getStore(Integer bno);
     void updateStore(StoreVO vo);
@@ -20,7 +24,7 @@ public interface StoreMapper {
 
     // 수익금 저장
     void insertRevenue(RevenueVO revenue);
-    List<RevenueVO> getRevenueList(int sno);
+
 
     List<StoreVO> selectlocation(String location);
 

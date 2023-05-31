@@ -23,7 +23,7 @@ public class StoreServiceImpl implements StoreService{
 
 
     @Override
-    public void registerStore(StoreVO vo) {
+    public void insertStore(StoreVO vo) {
         System.out.println("서비스 "+vo);
         vo.setBno(businessMapper.getMaxBno());
         System.out.println("서비스22 "+vo);
@@ -64,7 +64,6 @@ public class StoreServiceImpl implements StoreService{
 
     @Override
     public void insertRevenue(RevenueVO revenue) {
-        System.out.println("매출 테이블에 정보 추가 : " + revenue);
         storeMapper.insertRevenue(revenue);
     }
 

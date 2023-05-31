@@ -27,7 +27,7 @@
         align-items: center;
     }
     #mypage-menu > div > a {
-        color: #000000;
+        color: #8a8a8a;
     }
     .content{
         display: flex;
@@ -125,7 +125,6 @@
             <table border="1">
                 <thead>
                 <tr>
-                    <th>사용자 아이디</th>
                     <th>상품명</th>
                     <th>구매 날짜</th>
                     <th>기간</th>
@@ -136,11 +135,7 @@
                 <tbody>
                 <c:set var="today" value="<%= new java.util.Date() %>" />
                 <c:forEach items="${buyInfo}" var="buy">
-                    <%!
-                        int daysDiff; // 변수를 스크립트릿 태그 안에서 선언
-                    %>
                     <tr>
-                        <td>${buy.u_id}</td>
                         <td><a href='/board/read?pno=${buy.pno}'>${buy.p_name}</a></td>
                         <td>
                             <fmt:formatDate value="${buy.buyTime}" var="formattedBuyTime" pattern="yyyy년 MM월 dd일"/>
@@ -151,24 +146,20 @@
                             <fmt:parseDate value="${buy.startDate}" var="startDate" pattern="yyyy년 MM월 dd일"/>
                             <fmt:parseDate value="${buy.endDate}" var="endDate" pattern="yyyy년 MM월 dd일"/>
                             <%
-                                // startDate와 endDate 값을 가져옴
+                                java.util.Date today = new java.util.Date();
                                 java.util.Date startDate = (java.util.Date) pageContext.getAttribute("startDate");
                                 java.util.Date endDate = (java.util.Date) pageContext.getAttribute("endDate");
 
-                                // 남은 일수 계산
-                                long diffMillis = endDate.getTime() - startDate.getTime();
-                                int daysDiff = (int) (diffMillis / (24 * 60 * 60 * 1000));
-
                                 // 현재 날짜와 endDate 사이의 일수 계산
-                                long currentDiffMillis = endDate.getTime() - startDate.getTime();
+                                long currentDiffMillis = endDate.getTime() - today.getTime();
                                 int currentDaysDiff = (int) (currentDiffMillis / (24 * 60 * 60 * 1000));
                             %>
                             <c:choose>
-                                <c:when test="<%= currentDaysDiff+1 <= 0 %>">
-                                    <button type="button" id="delBtn1" onclick="deleteItem(${buy.pno})">기간만료삭제</button>
+                                <c:when test="<%= currentDaysDiff + 1 <= 0 %>">
+                                    <button type="button" id="delBtn1" onclick="deleteItem(${buy.pno})">기간만료</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <%= currentDaysDiff+1 %>일
+                                    <%= currentDaysDiff + 1 %>일
                                 </c:otherwise>
                             </c:choose>
                         </td>
@@ -180,12 +171,6 @@
                                     <button id="nowRefund" onclick="nowRefund('${buy.u_id}', ${buy.pno}, ${buy.p_price})">즉시환불</button>
                                 </td>
                             </c:when>
-<%--                            추후 추가--%>
-<%--                            <c:when test="${(currentTimeMillis - buyTimeMillis) >= (3 * 60 * 60 * 1000) && (currentTimeMillis - buyTimeMillis) < (7 * 24 * 60 * 60 * 1000)}">--%>
-<%--                                <td>--%>
-<%--                                    <button id="refundRequest" onclick="refundRequest('${buy.u_id}', ${buy.pno}, ${buy.p_price})">환불신청</button>--%>
-<%--                                </td>--%>
-<%--                            </c:when>--%>
                             <c:otherwise>
                                 <td>
                                     <button disabled>불가능</button>
@@ -262,8 +247,8 @@
                         }
                         document.write(stars);
                     </script></span></div>
-                    <div class="divp_name" style="width: 120px; text-align: center;"><a href="board/read?pno=${review.pno}" class="p_name"> ${review.p_name}</a></div>
-                    <div class="divtextreview" style="width: 500px;"> <span class="textreview"> ${review.review}</span></div>
+                    <div class="divp_name" style="width: 280px; text-align: center;"><a href="board/read?pno=${review.pno}" class="p_name"> ${review.p_name}</a></div>
+                    <div class="divtextreview" style="width: 450px;"> <span class="textreview"> ${review.review}</span></div>
                     <span class="date" style="color: #ff731b;">${review.sys_date}</span>
                 </div>
             </div>
@@ -314,10 +299,7 @@
             alert("로그인 후 이용해주세요.");
             return;
         }
-
-        const selectedItems = []; // 선택된 항목의 ID를 담을 배열
-
-        // 선택된 항목의 ID를 배열에 추가
+        const selectedItems = [];
         $('.selectedItems:checked').each(function () {
             selectedItems.push($(this).val());
         });
@@ -326,13 +308,11 @@
             alert("삭제할 항목을 선택해주세요.");
             return;
         }
-
-        // 선택된 항목의 ID를 URL에 추가하여 AJAX 요청
         $.ajax({
             type: "POST",
             url: "/wishlist/delete",
-            data: JSON.stringify(selectedItems), // 선택된 항목의 ID 배열을 JSON 형식으로 변환하여 서버로 전달
-            contentType: "application/json", // 전달하는 데이터의 형식을 명시 (JSON 형식)
+            data: JSON.stringify(selectedItems),
+            contentType: "application/json",
             success: function(response) {
                 alert("선택된 항목이 찜목록에서 삭제되었습니다.");
                 location.reload()
@@ -342,6 +322,8 @@
             },
         });
     };
+
+
 
     function deleteItem(pno) {
         $.ajax({
@@ -361,7 +343,6 @@
     }
 
     function nowRefund(u_id, pno, p_price){
-        console.log("환불진입")
         if(confirm("구매 후 세시간이 지나지 않아 즉시 환불이 가능합니다. \n 환불하시겠습니까?")){
             $.ajax({
                 type:'POST',
@@ -383,6 +364,8 @@
             alert("취소되었습니다.")
         }
     }
+
+
 
     function refundRequest(u_id, pno, p_price){
         console.log("환불요청"+u_id+pno+p_price)

@@ -36,36 +36,29 @@ public class CategoryController {
             , @RequestParam(value="nowPage", required=false)String nowPage
             , @RequestParam(value="cntPerPage", required=false)String cntPerPage){
         int total = productService.countBoard();
-//        System.out.println("@@@@@@@@@@@@@@@@"+total);
         int Foodproducttotal = productService.countProduct("food");
-        System.out.println("토탈11111111@@@ " + Foodproducttotal);
-
         if (nowPage == null && cntPerPage == null) {
             nowPage = "1";
-            cntPerPage = "16";
+            cntPerPage = "12";
         } else if (nowPage == null) {
             nowPage = "1";
         } else if (cntPerPage == null) {
-            cntPerPage = "16";
+            cntPerPage = "12";
         }
         int cntPage= 0;
-        if ((Foodproducttotal / 16.0)>0){
-            cntPage = (int) Math.ceil(Foodproducttotal / 16.0);
+        if ((Foodproducttotal / 12.0)>0){
+            cntPage = (int) Math.ceil(Foodproducttotal / 12.0);
         }else{
             cntPage = 1;
         }
         vo = new PagingVO(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage),cntPage);
-        System.out.println("vo~~!!!!!" + vo);
         model.addAttribute("paging", vo);
-
 
         List<ProductVO> Foodlist = productService.selectCategory("food");
         List<AttachFileDTO> thumbnailList = new ArrayList<>();
         for (ProductVO product : Foodlist) {
             thumbnailList.add(fileService.selectMainThumbnail(product.getPno()));
         }
-        System.out.println("thumbnailList:"+thumbnailList);
-        System.out.println("Foodlist:" + Foodlist);
         model.addAttribute("Foodlist",Foodlist);
         model.addAttribute("thumbnailList",thumbnailList);
         return "/main/food";
@@ -79,16 +72,16 @@ public class CategoryController {
 //        System.out.println("@@@@@@@@@@@@@@@@"+total);
         if (nowPage == null && cntPerPage == null) {
             nowPage = "1";
-            cntPerPage = "16";
+            cntPerPage = "12";
         } else if (nowPage == null) {
             nowPage = "1";
         } else if (cntPerPage == null) {
-            cntPerPage = "16";
+            cntPerPage = "12";
         }
         int academyproducttotal = productService.countProduct("academy");
         int cntPage= 0;
-        if ((academyproducttotal / 16.0)>0){
-            cntPage = (int) Math.ceil(academyproducttotal / 16.0);
+        if ((academyproducttotal / 12.0)>0){
+            cntPage = (int) Math.ceil(academyproducttotal / 12.0);
         }else{
             cntPage = 1;
         }
@@ -116,16 +109,16 @@ public class CategoryController {
 //        System.out.println("@@@@@@@@@@@@@@@@"+total);
         if (nowPage == null && cntPerPage == null) {
             nowPage = "1";
-            cntPerPage = "16";
+            cntPerPage = "12";
         } else if (nowPage == null) {
             nowPage = "1";
         } else if (cntPerPage == null) {
-            cntPerPage = "16";
+            cntPerPage = "12";
         }
         int Physical_Fitnessproductcount = productService.countProduct("physical fitness");
         int cntPage= 0;
-        if ((Physical_Fitnessproductcount / 16.0)>0){
-            cntPage = (int) Math.ceil(Physical_Fitnessproductcount / 16.0);
+        if ((Physical_Fitnessproductcount / 12.0)>0){
+            cntPage = (int) Math.ceil(Physical_Fitnessproductcount / 12.0);
         }else{
             cntPage = 1;
         }
@@ -152,16 +145,16 @@ public class CategoryController {
 //        System.out.println("@@@@@@@@@@@@@@@@"+total);
         if (nowPage == null && cntPerPage == null) {
             nowPage = "1";
-            cntPerPage = "16";
+            cntPerPage = "12";
         } else if (nowPage == null) {
             nowPage = "1";
         } else if (cntPerPage == null) {
-            cntPerPage = "16";
+            cntPerPage = "12";
         }
         int trafficproductcount = productService.countProduct("traffic");
         int cntPage= 0;
-        if ((trafficproductcount / 16.0)>0){
-            cntPage = (int) Math.ceil(trafficproductcount / 16.0);
+        if ((trafficproductcount / 12.0)>0){
+            cntPage = (int) Math.ceil(trafficproductcount / 12.0);
         }else{
             cntPage = 1;
         }
@@ -188,25 +181,18 @@ public class CategoryController {
             , @RequestParam(value="cntPerPage", required=false)String cntPerPage
             , @RequestParam(value="location",required=false) String location
             , @RequestParam(value="name",required=false) String name
-            , @RequestParam(value = "name1" ,required = false) String name1){
+            , @RequestParam(value="name1" ,required = false) String name1){
         int total = productService.countBoard();
-//        System.out.println("@@@@@@@@@@@@@@@@"+total);
         if (nowPage == null && cntPerPage == null) {
             nowPage = "1";
-            cntPerPage = "16";
+            cntPerPage = "12";
         } else if (nowPage == null) {
             nowPage = "1";
         } else if (cntPerPage == null) {
-            cntPerPage = "16";
+            cntPerPage = "12";
         }
-
-//
         model.addAttribute("paging", vo);
-        System.out.println("location:"+location);
-        System.out.println("name:"+name);
         List<StoreVO> locationlist = storeService.selectlocation(location);
-        System.out.println("location포함한:"+locationlist);
-
         List<ProductVO> lselectproduct = new ArrayList<>();
         List<AttachFileDTO> thumbnailList = new ArrayList<>();
         List<ProductVO> filteredList = new ArrayList<>();
@@ -217,35 +203,25 @@ public class CategoryController {
                 lselectproduct.addAll(productList);
             }
         }
-        System.out.println("프로덕트나와라:"+lselectproduct);
         //가져온 product에서 특정 카테고리를 포함한 product만 가져오기
         for (ProductVO lselect : lselectproduct){
             if(lselect.getP_category().contains(name)){
                 filteredList.add(lselect);
             }else{
-                System.out.println("걸렀어요");
             }
         }
-        System.out.println("필터최종:"+filteredList);
         for (ProductVO filteredList1 : filteredList) {
             thumbnailList.add(fileService.selectMainThumbnail(filteredList1.getPno()));
         }
-
         int locationcount = filteredList.size();
         int cntPage =0;
-        if ((locationcount / 16.0)>0){
-            cntPage = (int) Math.ceil(locationcount / 16.0);
+        if ((locationcount / 12.0)>0){
+            cntPage = (int) Math.ceil(locationcount / 12.0);
         }else{
             cntPage = 1;
         }
         vo = new PagingVO(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage),cntPage);
         model.addAttribute("paging", vo);
-        System.out.println("name1:"+name1);
-        System.out.println("위치:"+location);
-
-        System.out.println("thumbnailList:"+thumbnailList);
-        System.out.println("filteredList안뜨니????:" + filteredList);
-
         model.addAttribute("filteredList",filteredList);
         model.addAttribute("thumbnailList",thumbnailList);
         model.addAttribute("name",name);

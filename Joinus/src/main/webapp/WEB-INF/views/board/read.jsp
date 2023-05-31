@@ -297,13 +297,16 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="colorSelect">상품 소개</label>
+                        <div>${productVO.p_inst}</div>
+                    </div>
+                    <div class="form-group">
                         <label for="startDate">기간</label>
                         <br>
                         <c:if test="${productVO.p_type == 'fixed'}">
                             <input type="text" class="form-control" id="startDate" style="display: inline-block; width: 110px;" data-type="fixed" value="<fmt:formatDate value='${productVO.p_startDate}' pattern='yyyy-MM-dd' />">
                             <b style="display: inline-block; font-size: 25px; margin-right: 15px;">&nbsp&nbsp~</b>
                             <input type="text" class="form-control" id="endDate" style="display: inline-block; width: 110px;" data-type="fixed" value="<fmt:formatDate value='${productVO.p_endDate}' pattern='yyyy-MM-dd' />">
-
                         </c:if>
                         <c:if test="${productVO.p_type == 'free'}">
                             <input type="date" id="startDate" max="2099-12-31" data-type="free" class="period-startDate free" style="width: 120px; margin-right: 15px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
@@ -352,6 +355,7 @@
       <!-- 탭 내용 -->
       <div id="product_info" class="tabcontent" style="text-align: center">
           <h3 class="title">상품 상세 정보</h3>
+          <hr>
           <img src="/display?fileName=${productVO.detail.uploadPath}/${productVO.detail.uuid}_${productVO.detail.fileName}">
       </div>
 
@@ -387,7 +391,7 @@
           <br>
           <br>
           <div id="reviewList">
-              <c:forEach items="${productlist}" var="review">
+              <c:forEach items="${reviewlist}" var="review">
                   <div class="reviewItem">
                       <div class="reviewInfo">
                           &nbsp;<span class="star" style="color: #ff731b;">
@@ -416,7 +420,7 @@
                   </div>
               </c:forEach>
 
-              <c:if test="${empty productlist}">
+              <c:if test="${empty reviewlist}">
                   <div class="noReviews">작성한 리뷰가 없습니다.</div>
               </c:if>
           </div>
@@ -528,7 +532,6 @@
                 result = "0" + data;
             return result;
         }
-
         // 현재 날짜 설정
         var currentDate = new Date();  // 현재 날짜와 시간을 가져옴
         var now = currentDate.getFullYear() + "-" // 연도
@@ -569,6 +572,27 @@
 </script>
 <script>
     $(document).ready(function() {
+        $("#inqua").click(function() {
+            if ($("#u_id").val() === "" && $("#b_id").val() === "") {
+                alert("로그인 후 다시 시도해주세요!");
+                return false;
+            }
+            if($("#u_id").val() !== ""){
+                if ($("#u_id").val() !== $("#inquiryu_id").val() ) {
+                    alert("문의글은 작성자만 볼 수 있습니다.");
+                    return false;
+                }
+            }else if($("#bno").val() !== ""){
+                if($("#sno").val() !== $("#psno").val()){
+                    alert("현재 제품 판매자만 가능합니다.")
+                    return false;
+                }
+            }else {return true;}
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
         console.log($("#b_id").val());
         console.log("으아아아아악!");
         console.log("호오?"+ $("#inquiryu_id").val())
@@ -597,8 +621,54 @@
                 return true;
             }
         });
-
     });
+</script>
+<script>
+    $(document).ready(function(){
+        const MonthTenUnder = (data) => {
+            var result = "";
+            if(data < 10)
+                result = "0" + data;
+            return result;
+        }
+
+        // 현재 날짜 설정
+        var currentDate = new Date();  // 현재 날짜와 시간을 가져옴
+        var now = currentDate.getFullYear() + "-" // 연도
+            + MonthTenUnder(currentDate.getMonth() + 1) + "-" // 월 (0부터 시작하므로 1을 더해줌)
+            + currentDate.getDate();  // 일
+
+        $("#startDate.free").attr("min", now)
+        $("#startDate.free").attr("value", now)
+
+        $("#endDate.free").attr("min", now)
+        $("#endDate.free").attr("value", now)
+
+        var startDate = $("#startDate.free").val();
+        var endDate = $("#startDate.free").val();
+
+        // 입력값 변경 시, 시작일이 종료일 보다 클 경우
+        $("#startDate.free").on("change", function () {
+            var date = $(this).val();
+            if (date > endDate) {
+                alert("종료일 보다 큽니다.");
+                $("#startDate.free").val(startDate);
+            } else {
+                startDate = date;
+            }
+        })
+
+        // 입력값 변경 시, 종료일이 시작일 보다 작을 경우
+        $("#endDate.free").on("change", function (){
+            var date = $(this).val();
+            if($(this).val() < startDate){
+                alert("시작일 보다 작습니다.");
+                $("#endDate.free").val(endDate);
+            }else{
+                endDate = date;
+            }
+        })
+    })
 </script>
 <script>
     var avgValue = ${avg}; // avg 값이 0인 경우 숨김 처리
@@ -629,13 +699,7 @@
     };
 </script>
 <script type="text/javascript">
-    console.log("일단 작동")
     $(document).ready(function() {
-        console.log("일단 작동")
-        console.log($("#productname").text())
-        console.log($("#productlist").val())
-        console.log($("#u_id").val())
-        console.log("뜨나요??" + $("#b_id").val());
         $(".btnreview").click(function (){
             if($("#u_id").val()=="") {
                 if($("#u_id").val()=="" && $("#b_id").val()==""){
@@ -731,9 +795,7 @@
 <script>
     // 로그인 여부 확인 함수
   function isLoggedIn() {
-    // 로그인 여부를 확인하는 코드 작성
     // 로그인되어 있으면 true 반환, 아니면 false 반환
-    // 예시:
       if (${customerUserVO == null || customerUserVO.u_id == null}) {
       return false;
     } else {
@@ -749,7 +811,6 @@
             return;
         }else {
             var data_like = $("#wishBtn").text()
-            // console.log("data_like : " + data_like)
             let f1 = $('#wishBtn').data('a');
             let f2 = $('#wishBtn').data('b');
             // p_name, p_category 추가
@@ -762,14 +823,12 @@
                 if (($("#customerUserVO") != null || $("#u_id") != null)){
                     flag = !flag
                     $('#wishBtn').text("🤍");
-                    console.log('여기는 삭제');
                 }
             } else {
                 addWishlist(f1, f2, p_name, p_category);
                 if (($("#customerUserVO") != null || $("#u_id") != null)){
                     flag = !flag
                     $('#wishBtn').text("❤️");
-                    console.log('여기는 추가');
                 }
             }
         }
@@ -842,14 +901,12 @@
                     var f5 = $('#totalPrice').val();
                     var f6 = $("#startDate").val();
                     var f7 = $("#endDate").val();
-                    console.log(f5,f6,f7)
                     var flag = false
                     if(data_cart == "🛒"){
                         deleteCart();
                         if ($("#customerUserVO") != null || $("#u_id") != null){
                             flag = !flag
                             $('#cartBtn').text("장바구니담기");
-                            console.log('여기는 삭제');
                         }
                     } else {
                         if(${businessUser != null}){
@@ -858,10 +915,8 @@
                         }else {
                             addCart(f3, f4, f5, f6, f7);
                             if ($("#customerUserVO") != null || $("#u_id") != null) {
-
                                 flag = !flag
                                 $('#cartBtn').text("🛒");
-                                console.log('여기는 추가');
                             }
                         }
                     }
@@ -930,7 +985,6 @@
       type: "GET",
       url: "/cart/delete?pno="+${productVO.pno},
       success: function(data) {
-        console.log("삭제 들어오나");
         alert("장바구니에서 삭제되었습니다.");
       },
       error: function (xhr, status, error) {

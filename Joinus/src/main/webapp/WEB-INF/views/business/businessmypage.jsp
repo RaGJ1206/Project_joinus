@@ -6,7 +6,7 @@
 </head>
 <%@ include file="../header/header.jsp"%>
 <style>
-    @font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 100;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.otf) format('opentype');}
+    @font-face {font-famiXly: 'Noto Sans KR';font-style: normal;font-weight: 100;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.otf) format('opentype');}
     @font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 300;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.otf) format('opentype');} @font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 400;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.otf) format('opentype');} @font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 500;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.otf) format('opentype');} @font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 700;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.otf) format('opentype');} @font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 900;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.otf) format('opentype');}
     #mypage-menu {
         display: flex;
@@ -25,7 +25,7 @@
         align-items: center;
     }
     #mypage-menu > div > a {
-        color: #343434;
+        color: #8a8a8a;
     }
     .view {
         display: inline-block;
@@ -103,6 +103,14 @@
         font-weight: bold;
         margin-top: 20px;
     }
+    .empty-message {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: #888;
+        height: 300px;
+        text-align: center;
+    }
 </style>
 </head>
 <body>
@@ -147,7 +155,7 @@
                         document.write(stars);
                     </script></span></div>
                             <div class="divp_name" style="width: 270px; text-align: center;"><a href="board/read?pno=${review.pno}" class="p_name"> ${review.p_name}</a></div>
-                            <div class="divu_id" style="width: 30px; text-align: center;"><span>${review.u_id}</span></div>
+                            <div class="divu_id" style="width: 50px; text-align: center;"><span>${review.u_name}</span></div>
                             <div class="divtextreview" style="width: 500px; text-align: center;"> <span class="textreview"> ${review.review}</span></div>
                             <span class="date" style="color: #ff731b;">${review.sys_date}</span>
                         </div>
@@ -165,44 +173,42 @@
     </div>
     <div id="notice-page" style="display: none;">
         <div class="page-content">
-            <c:forEach items="${memberManagement}" var="member" varStatus="loop">
-                <c:if test="${loop.first || member.p_name != memberManagement[loop.index - 1].p_name}">
-                    <div class="product-name">
-                            ${member.p_name}
-                    </div>
-                    <table class="product-table" border="1">
-                        <thead>
-                        <tr>
-                            <th>사용자</th>
-                            <th>기간</th>
-                            <th>메모</th>
-<%--                            <th>환불요청</th>--%>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach items="${memberManagement}" var="subMember">
-                            <c:if test="${subMember.p_name == member.p_name}">
+            <c:choose>
+                <c:when test="${!empty memberManagementProduct}">
+                    <c:forEach items="${memberManagementProduct}" var="member" varStatus="loop">
+                        <c:if test="${loop.first || member.p_name != memberManagement[loop.index - 1].p_name}">
+                            <table class="product-table" border="1">
+                                <thead>
                                 <tr>
-                                    <td>${subMember.u_id}</td>
-                                    <td>${subMember.startDate} ~ ${subMember.endDate}</td>
-                                    <td>${subMember.memo}</td>
-<%--                                    <td>--%>
-<%--                                        <c:choose>--%>
-<%--                                            <c:when test="${refundVO != ''}">--%>
-<%--                                                <button id="refundResponse" onclick="refundResponse('${refundVO.u_id}', ${refundVO.pno}, ${refundVO.p_price})">환불요청</button>--%>
-<%--                                            </c:when>--%>
-<%--                                            <c:otherwise>--%>
-<%--                                                ${refundVO.u_id} 요청없음--%>
-<%--                                            </c:otherwise>--%>
-<%--                                        </c:choose>--%>
-<%--                                    </td>--%>
+                                    <th colspan="3">${member.p_name}</th>
                                 </tr>
-                            </c:if>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </c:if>
-            </c:forEach>
+                                <tr>
+                                    <th>사용자</th>
+                                    <th>기간</th>
+                                    <th>메모</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <c:forEach items="${memberManagement}" var="subMember">
+                                    <c:if test="${subMember.p_name == member.p_name}">
+                                        <tr>
+                                            <td>${subMember.u_id}</td>
+                                            <td>${subMember.startDate} ~ ${subMember.endDate}</td>
+                                            <td>${subMember.memo}</td>
+                                        </tr>
+                                    </c:if>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </c:if>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <div class="empty-message" style="display: flex; justify-content: center; align-items: center;">
+                        <p>판매내역이 없습니다.</p>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 
@@ -301,7 +307,6 @@
             }
         }
 
-        console.log(weekTotalAmounts)
         chart = new Chart(ctx, {
             type: 'bar',
             data: {
